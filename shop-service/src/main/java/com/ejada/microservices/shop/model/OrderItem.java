@@ -5,24 +5,39 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
+@Table(name = "order_item")
 
-public class OrderItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@NoArgsConstructor
+@Getter
+@Setter
+public class OrderItem  {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(name = "product_id")
-    private Long productId;
+	@Column(name = "product_id")
+	private Long productId;
 	@Column(name = "shop_id")
 	private Long shopId;
-    @Column(name = "product_price")
-    private Double price;
-    
-    @Column(name = "quantity")
-    private int quantity;
+	@Column(name = "product_price")
+	private Double price;
+
+	@Column(name = "quantity")
+	private Integer quantity;
+
+	public OrderItem(Long productId, Long shopId, Double price, int quantity) {
+		this.productId = productId;
+		this.shopId = shopId;
+		this.price = price;
+		this.quantity = quantity;
+	}
+	
+	
 }

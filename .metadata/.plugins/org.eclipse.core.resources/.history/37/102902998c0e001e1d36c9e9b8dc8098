@@ -1,0 +1,9 @@
+package com.ejada.microservices.shop.model;
+
+public interface CartOrderItem {
+    Long getId();
+    Long getProductId();
+    Long getShopId();
+    Double getPrice();
+    Integer getQuantity();
+}

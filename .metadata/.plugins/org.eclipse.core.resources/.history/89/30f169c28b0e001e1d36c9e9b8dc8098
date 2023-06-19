@@ -1,0 +1,6 @@
+package com.ejada.microservices.shop.model;
+
+public interface CartOrderItem {
+	Double getPrice();
+	void setPrice();
+}

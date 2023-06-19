@@ -44,4 +44,6 @@ public class CartItem {
 		this.productId = productId;
 		this.quantity = quantity;
 	}
+	
+	
 }
