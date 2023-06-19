@@ -16,7 +16,8 @@ This is an e-commerce application consisting of three microservices: Wallet, Sho
 - Wallet creation and management for users 
 - Deposit and withdrawal of funds from wallets 
 - Transaction history for users 
-- Provides RESTful API endpoints for interacting with the microservice ##Shop Microservice 
+- Provides RESTful API endpoints for interacting with the microservice
+- ## Shop Microservice 
 - Product creation and management for the online store -Shopping cart management for users 
 - Order creation and management 
 - Payment processing for orders Provides RESTful API endpoints for interacting with the microservice 
