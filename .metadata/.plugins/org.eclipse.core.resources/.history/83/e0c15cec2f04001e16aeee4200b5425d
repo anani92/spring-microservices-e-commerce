@@ -1,0 +1,11 @@
+package com.ejada.microservices.shop.proxy;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@FeignClient(name = "inventory-service")
+public interface InventoryServiceProxy {
+    @GetMapping("v1/items/{itemId}/quantity/{quantity}")
+    void updateInventoryQuantity(@PathVariable("itemId") int itemId, @PathVariable("quantity") int quantity);
+}

@@ -1,0 +1,45 @@
+package com.ejada.microservices.shop.proxy;
+
+import java.util.List;
+
+import com.ejada.microservices.shop.model.InventoryItem;
+
+public class FallBackResponses implements InventoryServiceProxy {
+
+	@Override
+	public InventoryItem updateInventoryQuantity(Long itemId, int quantity) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public InventoryItem updateInventorySupply(Long itemId, int quantity) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public InventoryItem getInventoryItem(long itemId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<InventoryItem> retrieveAllItems() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public InventoryItem createInventoryItem(InventoryItem item) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public InventoryItem updateInventoryItem(InventoryItem item) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

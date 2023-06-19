@@ -1,0 +1,41 @@
+package com.ejada.microservices.shop.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.shop.exceptions.InsufficientCreditsException;
+import com.ejada.microservices.shop.model.Order;
+import com.ejada.microservices.shop.model.OrderItem;
+import com.ejada.microservices.shop.proxy.WalletServiceProxy;
+import com.ejada.microservices.shop.repository.OrderRepository;
+
+@Service
+public class OrderService {
+	@Autowired
+	private OrderRepository orderRepository;
+	@Autowired
+	private WalletServiceProxy walletServiceProxy;
+
+	public Order createOrder(Long userId, List<OrderItem> items) {
+		Double totalCost = calculateTotalCost(items);
+		boolean hasSufficientCredits = walletServiceProxy.checkSufficientCredits(userId, totalCost);
+
+		if (hasSufficientCredits) {
+			walletServiceProxy.deductFromWallet(userId, totalCost);
+			Order order = new Order(userId, items, totalCost);
+			return orderRepository.save(order);
+		} else {
+			throw new InsufficientCreditsException("Insufficient credits in the user's wallet.");
+		}
+	}
+
+	public List<Order> getOrdersByUserId(Long userId) {
+		return orderRepository.findByUserId(userId);
+	}
+
+	private Double calculateTotalCost(List<OrderItem> items) {
+		return items.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
+	}
+}

@@ -1,0 +1,56 @@
+package com.ejada.microservices.shop.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.shop.exceptions.InsufficientCreditsException;
+import com.ejada.microservices.shop.model.Cart;
+import com.ejada.microservices.shop.model.CartItem;
+import com.ejada.microservices.shop.model.Order;
+import com.ejada.microservices.shop.model.OrderItem;
+import com.ejada.microservices.shop.proxy.WalletServiceProxy;
+import com.ejada.microservices.shop.repository.OrderRepository;
+
+@Service
+public class OrderService {
+	@Autowired
+	private OrderRepository orderRepository;
+	@Autowired
+	private WalletServiceProxy walletServiceProxy;
+	@Autowired
+	CartService cartService;
+
+	public Order createOrder(Cart cart) {
+		Long userId = cart.getUserId();
+		List<OrderItem> orderItems = new ArrayList<>();
+		for (CartItem cartItem : cart.getItems()) {
+			OrderItem orderItem = new OrderItem();
+			orderItem.setProductId(cartItem.getProductId());
+			orderItem.setQuantity(cartItem.getQuantity());
+			orderItem.setPrice(cartItem.getPrice());
+			orderItems.add(orderItem);
+		}
+		Double totalCost = calculateTotalCost(orderItems);
+		boolean hasSufficientCredits = walletServiceProxy.checkSufficientCredits(userId, totalCost);
+
+		if (hasSufficientCredits) {
+			walletServiceProxy.deductFromWallet(userId, totalCost);
+			Order order = new Order(userId, orderItems, totalCost);
+			cartService.deleteCart(cart.getId());
+			return orderRepository.save(order);
+		} else {
+			throw new InsufficientCreditsException("Insufficient credits in the user's wallet.");
+		}
+	}
+
+	public List<Order> getOrdersByUserId(Long userId) {
+		return orderRepository.findByUserId(userId);
+	}
+
+	private Double calculateTotalCost(List<OrderItem> items) {
+		return items.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
+	}
+}

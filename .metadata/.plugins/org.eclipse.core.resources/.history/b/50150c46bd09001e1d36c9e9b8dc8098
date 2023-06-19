@@ -1,0 +1,52 @@
+package com.ejada.microservices.shop.model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Table(name = "carts")
+public class Cart {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@Column(name = "user_id")
+	private Long userId;
+
+
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> items = new ArrayList<>();
+	@Column(name = "total_cost")
+	private Double totalCost = 0.0;
+
+	public Cart(Long userId, List<CartItem> items, Double totalCost) {
+		super();
+		this.userId = userId;
+		this.items = items;
+		this.totalCost = totalCost;
+	}
+
+	public Cart(Long userId) {
+		this.userId = userId;
+	}
+
+}

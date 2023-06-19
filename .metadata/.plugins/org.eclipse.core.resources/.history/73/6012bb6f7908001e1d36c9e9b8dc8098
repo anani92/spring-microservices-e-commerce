@@ -1,0 +1,185 @@
+package com.ejada.microservices.shop.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import com.ejada.microservices.shop.model.Cart;
+import com.ejada.microservices.shop.model.CartItem;
+import com.ejada.microservices.shop.model.InventoryItem;
+import com.ejada.microservices.shop.model.ShopItem;
+import com.ejada.microservices.shop.model.WalletItem;
+import com.ejada.microservices.shop.proxy.InventoryServiceProxy;
+import com.ejada.microservices.shop.proxy.WalletServiceProxy;
+import com.ejada.microservices.shop.service.CartService;
+import com.ejada.microservices.shop.service.ShopService;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@RestController
+@RequestMapping("v1/shop")
+public class ShopController {
+	@Autowired
+	private ShopService shopService;
+	@Autowired
+	private InventoryServiceProxy inventoryProxy;
+	@Autowired
+	private WalletServiceProxy walletProxy;
+	@Autowired
+	private CartService cartService;
+
+	private Logger logger = LoggerFactory.getLogger(ShopController.class);
+
+	@GetMapping
+	public List<ShopItem> retrieveAllItems() {
+		return shopService.findAll();
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<ShopItem> getShopItem(@PathVariable Long id) {
+		ShopItem shop = shopService.getShopItem(id);
+		if (shop == null) {
+			return ResponseEntity.notFound().build();
+		} else {
+			return ResponseEntity.ok(shop);
+		}
+	}
+
+	@GetMapping("/place-order/shop/{shopId}/cart/{cartId}")
+	public ResponseEntity<String> placeOrder(@PathVariable("cartId") Long cartId, @PathVariable("shopId") Long shopId) {
+		Cart cart = cartService.calculateTotal(cartId);
+		if (cart == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		for (CartItem cartItem : cart.getItems()) {
+
+			inventoryProxy.updateInventoryQuantity(cartItem.getProductId(), cartItem.getQuantity());
+			walletProxy.increaseShopCredits(shopId, cart.getTotalCost());
+		
+		
+		}
+		
+//			InventoryItem product = inventoryProxy.getInventoryItem(cartItem.getProductId());
+//			Double totalCost = product.getPrice() * cartItem.getQuantity();
+//			inventoryProxy.updateInventoryQuantity(product.getId(), cartItem.getQuantity());
+//			walletProxy.increaseShopCredits(shopId, totalCost);
+//		}
+		return null;
+	}
+
+	// need to be updated to use the user cart for updating credits of the shop and
+	// user wallet
+	@GetMapping("/purchase-feign/item/{itemId}/quantity/{quantity}/shop/{shopId}")
+//	@Retry(name = "purchaseApi", fallbackMethod = "fallbackResponse")
+	@CircuitBreaker(name = "purchaseApi", fallbackMethod = "fallbackResponse")
+	public ResponseEntity<String> makePurchaseFeign(@PathVariable("itemId") Long itemId,
+			@PathVariable("quantity") int quantity, @PathVariable Long shopId) {
+		ShopItem shop = shopService.getShopItem(shopId);
+		if (shop == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		InventoryItem inventoryItem = inventoryProxy.updateInventoryQuantity(itemId, quantity);
+		Double totalCost = inventoryItem.getPrice() * quantity;
+		WalletItem walletItemResponse = walletProxy.increaseShopCredits(shopId, totalCost);
+		shop.setTotalCredits(walletItemResponse.getCredits());
+		shopService.save(shop);
+		return ResponseEntity.ok("purchase complete total credit now is:" + walletItemResponse.getCredits());
+	}
+
+	@PutMapping
+	public ResponseEntity<ShopItem> updateShopItem(@RequestBody ShopItem item) {
+		ShopItem updatedItem = shopService.save(item);
+		return ResponseEntity.ok(updatedItem);
+	}
+
+	@PostMapping
+	public ResponseEntity<ShopItem> createShopItem(@RequestBody ShopItem item) {
+		ShopItem createdItem = shopService.save(item);
+		return ResponseEntity.status(HttpStatus.CREATED).body(createdItem);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteShopItem(@PathVariable Long id) {
+		ShopItem item = shopService.getShopItem(id);
+		if (item == null) {
+			return ResponseEntity.notFound().build();
+		} else {
+			shopService.deleteShopItem(id);
+			return ResponseEntity.noContent().build();
+		}
+	}
+
+	@GetMapping("/purchase/item/{itemId}/quantity/{quantity}/shop/{shopId}")
+//	@Retry(name = "purchaseApi", fallbackMethod = "fallbackResponse")
+
+	public ResponseEntity<InventoryItem> makeItemPurchase(@PathVariable("itemId") int itemId,
+			@PathVariable("quantity") Integer quantity, @PathVariable("shopId") Long shopId) {
+
+		logger.error("inside shop controller updateInventoryQuantity");
+
+		ShopItem shop = shopService.getShopItem(shopId);
+		if (shop == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		String inventoryEndpoint = "http://localhost:8100/v1/items/{itemId}/quantity/{quantity}";
+		String walletEndpoint = "http://localhost:9000/v1/wallet/shop/add";
+
+		// add request path variables to update item quantity
+
+		Map<String, Integer> uriVariables = new HashMap<>();
+		uriVariables.put("itemId", itemId);
+		uriVariables.put("quantity", quantity);
+
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<InventoryItem> inventoryItemResponse = restTemplate.getForEntity(inventoryEndpoint,
+				InventoryItem.class, uriVariables);
+		InventoryItem item = inventoryItemResponse.getBody();
+
+		if (item == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		// wallet params to update wallet of the shop
+		MultiValueMap<String, Object> walletParams = new LinkedMultiValueMap<>();
+		walletParams.add("totalCost", item.getPrice() * quantity);
+		walletParams.add("shopId", shopId);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		HttpEntity<MultiValueMap<String, Object>> walletRequest = new HttpEntity<>(walletParams, headers);
+		ResponseEntity<WalletItem> walletItemResponse = restTemplate.postForEntity(walletEndpoint, walletRequest,
+				WalletItem.class);
+		WalletItem walletItem = walletItemResponse.getBody();
+		shop.setTotalCredits(walletItem.getCredits());
+		shopService.save(shop);
+		return ResponseEntity.ok(item);
+
+	}
+
+	public ResponseEntity<InventoryItem> fallbackResponse(Exception e) {
+		logger.error("Fallback method executed for updateInventoryQuantity");
+
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	}
+}

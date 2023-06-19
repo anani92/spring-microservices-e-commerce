@@ -1,0 +1,125 @@
+package com.ejada.microservices.shop.service;
+
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.shop.model.Cart;
+import com.ejada.microservices.shop.model.CartItem;
+import com.ejada.microservices.shop.proxy.InventoryServiceProxy;
+import com.ejada.microservices.shop.repository.CartItemRepository;
+import com.ejada.microservices.shop.repository.CartRepository;
+
+@Service
+public class CartService {
+
+	@Autowired
+	private CartRepository cartRepo;
+	@Autowired
+	private CartItemRepository cartItemRepo;
+
+	private Double calculateTotalCost(List<CartItem> items) {
+		return items.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
+	}
+
+	@Transactional
+	public Cart addToCart(Long userId, CartItem cartItem) {
+		Cart cart = cartRepo.findByUserId(userId);
+		if (cart == null) {
+			cart = new Cart(userId);
+		}
+
+		CartItem existingItem = findCartItem(cartItem.getProductId(), cart.getItems());
+
+		if (existingItem != null) {
+			existingItem.setQuantity(existingItem.getQuantity() + cartItem.getQuantity());
+			cart.setTotalCost(calculateTotalCost(cart.getItems()));
+			cartItemRepo.save(cartItem);
+			cartRepo.save(cart);
+			return cart;
+		} else {
+			List<CartItem> cartItems = cart.getItems();
+			cartItems.add(cartItem);
+			cart.setItems(cartItems);
+			cart.setTotalCost(calculateTotalCost(cart.getItems()));
+			cartRepo.save(cart);
+			return cart;
+		}
+	}
+
+	public Cart updateCartItemQuantity(Cart cart, Long itemId, int quantity) {
+		List<CartItem> cartItems = cart.getItems();
+		CartItem cartItem = findCartItem(itemId, cartItems);
+		cartItem.setQuantity(quantity);
+		cartItems.add(cartItem);
+		cart.setItems(cartItems);
+		cartRepo.save(cart);
+		return cart;
+
+	}
+
+	public void deleteCartItem(Cart cart, Long itemId) {
+		if (cart != null) {
+			List<CartItem> cartItems = cart.getItems();
+			CartItem cartItem = findCartItem(itemId, cartItems);
+			if (cartItem != null) {
+				cartItems.remove(cartItem);
+				cart.setItems(cartItems);
+				cartRepo.save(cart);
+			}
+		}
+	}
+
+	public CartItem findCartItem(Long itemId, List<CartItem> cartItems) {
+		for (CartItem cartItem : cartItems) {
+			if (cartItem.getProductId() == itemId) {
+				return cartItem;
+			}
+		}
+		return null;
+	}
+
+	public Cart findCartById(Long cartId) {
+		Cart cart = cartRepo.findById(cartId).get();
+
+		return cart;
+	}
+
+	public Cart save(Cart cart) {
+		return cartRepo.save(cart);
+	}
+
+	public Cart findCartByUserId(long userId) {
+		Cart cart = cartRepo.findByUserId(userId);
+		return cart;
+	}
+
+	public void updateCartItemQuantity(Cart cart, Long cartItemProductId, Integer quantity) {
+		List<CartItem> cartItems = cart.getItems();
+		CartItem cartItem = findCartItem(cartItemProductId, cartItems);
+		if (cartItem != null) {
+			cartItem.setQuantity(quantity);
+			cart.setItems(cartItems);
+			cart.setTotalCost(calculateTotalCost(cart.getItems()));
+			cartRepo.save(cart);
+		}
+	}
+
+	public void deleteCart(Long id) {
+		cartRepo.deleteById(id);
+		cart.setTotalCost(calculateTotalCost(cart.getItems()));
+
+	}
+
+	public void clearCart(Long userId) {
+		Cart cart = cartRepo.findByUserId(userId);
+		cart.getItems().clear();
+		cart.setTotalCost(0.0);
+		cartRepo.save(cart);
+
+	}
+
+}

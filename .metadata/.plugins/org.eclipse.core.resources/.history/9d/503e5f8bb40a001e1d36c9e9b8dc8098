@@ -1,0 +1,9 @@
+
+server.port=8765
+spring.application.name=api-gateway-service
+spring.config.import=configserver:http://localhost:8888
+
+#spring.cloud.gateway.discovery.locator.enabled=true
+#spring.cloud.gateway.discovery.locator.lowerCaseServiceId=true
+
+management.endpoints.web.exposure.include=*

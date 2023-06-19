@@ -1,0 +1,96 @@
+package com.ejada.microservices.shop.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.shop.model.Cart;
+import com.ejada.microservices.shop.model.CartItem;
+import com.ejada.microservices.shop.model.InventoryItem;
+import com.ejada.microservices.shop.repository.CartRepository;
+
+@Service
+public class CartService {
+
+	@Autowired
+	private CartRepository cartRepo;
+
+	public Cart calculateTotal(Long cartId) {
+		Cart cart = cartRepo.findByUserId(cartId);
+		Double totalPrice = 0.0;
+		if (cart == null) {
+			return null;
+		}
+		for (CartItem item : cart.getItems()) {
+			totalPrice += item.getPrice() * item.getQuantity();
+		}
+		cart.setTotalCost(totalPrice);
+		cartRepo.save(cart);
+		return cart;
+		
+	}
+	
+	public Cart createCart(Long userId) {
+		List<CartItem> items = new ArrayList<>();
+		return new Cart(userId, items , 0.0);
+		
+	}
+	
+	public Cart addToCart(Long userId, InventoryItem item, int quantity) {
+		Cart cart = cartRepo.findByUserId(userId);
+		if (cart == null) {
+			cart = new Cart(userId, new ArrayList<CartItem>(), 0.0);
+		}
+		CartItem cartItem = findCartItem(item.getId(), cart);
+
+		if (cartItem != null) {
+			cartItem.setQuantity(cartItem.getQuantity() + quantity);
+			
+			return cart;
+		} else {
+			cartItem = new CartItem(userId, item.getId(), quantity, item.getPrice());
+			List<CartItem> updatedCart = cart.getItems();
+			updatedCart.add(cartItem);
+			cart.setItems(updatedCart);
+			cartRepo.save(cart);
+			return cart;
+		}
+
+	}
+
+	public void deleteCartItem(Long cartId, Long itemId) {
+		Cart cart = cartRepo.findById(cartId).get();
+		if (cart != null) {
+			List<CartItem> cartItems = cart.getItems();
+			for (CartItem item : cartItems) {
+				if (item.getProductId() == itemId) {
+					cartItems.remove(item);
+					cart.setItems(cartItems);
+					cartRepo.save(cart);
+				}
+			}
+		}
+	}
+
+	public CartItem findCartItem(Long itemId, Cart cart) {
+		for (CartItem cartItem : cart.getItems()) {
+			if (cartItem.getProductId() == itemId) {
+				return cartItem;
+			}
+		}
+		return null;
+	}
+
+	public Cart findCartById(Long cartId) {
+		Cart cart = cartRepo.findById(cartId).get();
+
+		return cart;
+	}
+
+	public Cart save(Cart cart) {
+		return cartRepo.save(cart);
+	}
+
+}

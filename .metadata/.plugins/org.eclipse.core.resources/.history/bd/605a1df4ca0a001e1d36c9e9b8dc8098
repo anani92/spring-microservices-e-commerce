@@ -1,0 +1,6 @@
+package com.ejada.microservices.wallet.model;
+
+
+public class Transactions {
+	
+}

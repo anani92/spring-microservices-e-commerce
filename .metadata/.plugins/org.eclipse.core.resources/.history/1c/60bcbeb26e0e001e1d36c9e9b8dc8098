@@ -1,0 +1,6 @@
+spring.application.name=zipkin-server
+spring.profile.active=default
+server.port=9411
+spring.config.import=configserver:http://localhost:8888 
+spring.sleuth.enabled=true
+spring.zipkin.base-url=http://zipkin-server:9411

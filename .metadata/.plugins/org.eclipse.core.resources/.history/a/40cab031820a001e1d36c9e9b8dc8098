@@ -1,0 +1,5 @@
+package com.ejada.microservices.shop.exceptions;
+
+public class OutOfStockException {
+
+}

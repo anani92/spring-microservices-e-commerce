@@ -1,0 +1,98 @@
+package com.ejada.microservices.shop.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ejada.microservices.shop.model.Cart;
+import com.ejada.microservices.shop.model.CartItem;
+import com.ejada.microservices.shop.model.InventoryItem;
+import com.ejada.microservices.shop.proxy.InventoryServiceProxy;
+import com.ejada.microservices.shop.service.CartService;
+
+@RestController
+@RequestMapping("v1/cart")
+public class CartController {
+	@Autowired
+	private CartService cartService;
+
+	@Autowired
+	private InventoryServiceProxy inventoryProxy;
+
+	@GetMapping("/{userId}")
+	public ResponseEntity<Cart> retrieveCart(@PathVariable("userId") long userId) {
+		Cart cart = cartService.findCartByUserId(userId);
+		if (cart == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		return ResponseEntity.ok(cart);
+
+	}
+
+	@GetMapping("/add/user/{userId}/quantity/{quantity}/item/{inventoryItemId}/shop/{shopId}")
+	public ResponseEntity<Cart> addToCart(@PathVariable("inventoryItemId")  Long inventoryItemId, @PathVariable("userId") Long userId,@PathVariable("quantity") Integer quantity,  @PathVariable("shopId") Long shopId) {
+		InventoryItem item = inventoryProxy.getInventoryItem(inventoryItemId);
+		if (item == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		CartItem cartItem = new CartItem();
+		cartItem.setProductId(inventoryItemId);
+		cartItem.setQuantity(quantity);
+		cartItem.setPrice(item.getPrice());
+		cartItem.setShopId(shopId);
+		Cart cart = cartService.addToCart(userId, cartItem);
+
+		return ResponseEntity.ok(cart);
+	}
+
+	@DeleteMapping("/delete/{userId}/item/{ItemId}")
+	public ResponseEntity<String> deleteItem(@PathVariable("userId") Long userId, @PathVariable("ItemId") Long ItemId) {
+		Cart cart = cartService.findCartByUserId(userId);
+		if (cart == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+		}
+		CartItem cartItem = cartService.findCartItem(ItemId, cart.getItems());
+		if (cartItem != null) {
+			cartService.deleteCartItem(cart , ItemId);
+			return ResponseEntity.ok(String.format("Item with ID: %s deleted from your cart ", cartItem.getProductId()));
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+	}
+	
+	@PutMapping("/user/{userId}/item/{itemId}/quantity/{quantity}")
+	public ResponseEntity<Cart> updateCartItemQuantity(@PathVariable("userId") Long userId, @PathVariable("quantity") Integer quantity, @PathVariable("itemId") Long itemId) {
+		Cart cart = cartService.findCartByUserId(userId);
+		if (cart == null) {
+			// update this method to create a new cart if it doesn't exists
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		} 
+		CartItem cartItem = cartService.findCartItem(itemId, cart.getItems());
+		if (cartItem != null) {
+			cartService.updateCartItemQuantity(cart, itemId , quantity);
+			return ResponseEntity.ok(cart);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		
+	} 
+	@PutMapping("/empty/{userId}")
+	public ResponseEntity<Void> emptyUserCart(@PathVariable("userId") Long userId) {
+		Cart cart = cartService.findCartByUserId(userId);
+		if (cart == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}  else {
+			cartService.emptyCart(cart.getId());
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+
+}

@@ -1,0 +1,105 @@
+package com.ejada.microservices.wallet.controller;
+
+import java.util.NoSuchElementException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ejada.microservices.wallet.exceptions.InsufficientCreditsException;
+import com.ejada.microservices.wallet.model.ShopWallet;
+import com.ejada.microservices.wallet.model.User;
+import com.ejada.microservices.wallet.model.UserWallet;
+import com.ejada.microservices.wallet.service.ShopWalletService;
+import com.ejada.microservices.wallet.service.UserService;
+import com.ejada.microservices.wallet.service.UserWalletService;
+
+@RestController
+@RequestMapping("/v1/wallet")
+public class WalletController {
+	@Autowired
+	private ShopWalletService walletService;
+	@Autowired
+	private UserWalletService userWalletService;
+	@Autowired 
+	private UserService userService;
+	
+	@GetMapping("/user/{userId}")
+	public ResponseEntity<UserWallet> getUserWallet(@PathVariable("userId") Long userId) {
+		User user = userService.getUserById(userId);
+		UserWallet wallet = userWalletService.getUserWallet(user);
+		if (wallet == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		return ResponseEntity.ok(wallet);
+	}
+
+	@PutMapping("/shop/add")
+	public ResponseEntity<ShopWallet> increaseShopCredits(@RequestParam("shopId") Long shopId, @RequestParam("totalCost") Double totalCost) {
+		ShopWallet shopWallet = walletService.addCredits(totalCost, shopId);
+		walletService.save(shopWallet);
+		return ResponseEntity.status(HttpStatus.CREATED).body(shopWallet);
+	}
+	
+	@GetMapping("/{userId}/sufficient-credits")
+	public boolean checkSufficientCredits(@PathVariable("userId") Long userId, @RequestParam("amount") Double amount) {
+		User user = userService.getUserById(userId);
+		Double credits = user.getUserWallet().getCredits();
+		return credits >= amount;
+		
+	}
+	
+	@PutMapping("/{userId}/deduct-credits")
+	void deductFromWallet(@PathVariable("userId") Long userId, @RequestParam("amount") Double amount) {
+	    User user = userService.getUserById(userId);
+	    if (user == null) {
+	    	throw new NoSuchElementException("User Not found");
+	    }
+	    userWalletService.updateCredits(user, amount, false);
+		userService.save(user);
+
+	    
+	}
+	
+	// withdraw
+	@GetMapping("/users/withdraw/{userId}/{amount}")
+	public Double withdraw(@PathVariable("userId") Long userId, @PathVariable("amount") Double amount ) {
+		User user = userService.getUserById(userId);
+		if (!checkSufficientCredits(userId, amount)) {
+			throw new InsufficientCreditsException("insuffecient funds");
+		}
+		Double credits = user.getUserWallet().getCredits() - amount;
+		userWalletService.updateCredits(user, credits, false);
+		return credits;
+	}
+	// deposit
+	@GetMapping("/users/deposit/{userId}/{amount}")
+	public Double deposit(@PathVariable("userId") Long userId, @PathVariable("amount") Double amount ) {
+		User user = userService.getUserById(userId);
+		UserWallet wallet = user.getUserWallet();
+		Double credits = user.getUserWallet().getCredits() + amount;
+		userWalletService.updateCredits(user, credits, true);
+		return credits;
+
+	}
+	
+	// delete user wallet
+	@DeleteMapping("/users/{userId}")
+	public ResponseEntity<String> deleteUserWallet(@PathVariable("userId") Long userId) {
+		return null;
+	}
+
+	
+	
+
+	
+	
+}

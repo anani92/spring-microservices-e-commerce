@@ -1,0 +1,28 @@
+package com.ejada.microservices.gateways;
+
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.WebClient;
+
+@Configuration
+public class ApiGatewayConfiguration {
+	@Autowired
+	private WebClient.Builder webClientBuilder;
+
+	@Bean
+	@LoadBalanced
+	public WebClient.Builder loadBalancedWebClientBuilder() {
+		return WebClient.builder();
+	}
+
+	@Bean
+	public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
+		return builder.routes().route(r -> r.path("/inventory-service/v1/items").uri("lb://inventory-service/**"))
+				.route(r -> r.path("v1/shop").uri("lb://shop-service/**"))
+				.route(r -> r.path("v1/wallet").uri("lb://wallet-service/**")).build();
+	}
+}

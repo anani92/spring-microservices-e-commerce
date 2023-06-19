@@ -1,0 +1,7 @@
+package com.ejada.microservices.shop.model;
+
+
+
+public class Cart {
+
+}

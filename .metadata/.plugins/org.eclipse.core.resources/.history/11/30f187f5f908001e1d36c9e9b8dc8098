@@ -1,0 +1,8 @@
+package com.ejada.microservices.wallet.model;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserWallet {
+	
+}

@@ -1,0 +1,50 @@
+package com.ejada.microservices.inventory.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.inventory.model.InventoryItem;
+import com.ejada.microservices.inventory.repository.InventoryRepository;
+
+@Service
+public class InventoryService {
+	@Autowired
+	private InventoryRepository inventoryRepository;
+
+	public InventoryItem save(InventoryItem item) {
+		return inventoryRepository.save(item);
+	}
+
+	public Optional<InventoryItem> getInventoryItem(Long id) {
+		Optional<InventoryItem> item = inventoryRepository.findById(id);
+		return item;
+
+	}
+	
+	public void updateInventoryQuantity(Long id, int quantity) {
+        Optional<InventoryItem> itemOptional = inventoryRepository.findById(id);
+        if (itemOptional.isPresent()) {
+        	InventoryItem item = itemOptional.get();
+        	int updatedQuantity = item.getQuantity() + quantity;
+            item.setQuantity(updatedQuantity);
+            inventoryRepository.save(item);
+        }
+	}
+	
+
+	public List<InventoryItem> getAllInventoryItems() {
+		return inventoryRepository.findAll();
+	}
+
+	public void deleteInventoryItem(Long id) {
+		inventoryRepository.deleteById(id);
+	}
+
+	public List<InventoryItem> findAll() {
+		return inventoryRepository.findAll();
+	}
+
+}

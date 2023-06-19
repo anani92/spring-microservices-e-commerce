@@ -1,0 +1,15 @@
+-- Create InventoryItem table
+CREATE TABLE InventoryItem (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  item_name VARCHAR(255),
+  quantity INT,
+  price DECIMAL(10, 2)
+);
+
+-- Insert sample data into InventoryItem table
+INSERT INTO InventoryItem (item_name, quantity, price) VALUES
+  ('Item A', 10, 9.99),
+  ('Item B', 5, 14.99),
+  ('Item C', 2, 24.99),
+  ('Item D', 8, 7.99),
+  ('Item E', 3, 12.99);

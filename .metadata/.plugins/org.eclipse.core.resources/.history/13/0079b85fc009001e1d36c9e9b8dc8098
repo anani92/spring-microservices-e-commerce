@@ -1,0 +1,5 @@
+package com.ejada.microservices.shop.repository;
+
+public interface CartItemRepository extends JpaRepository<CartItem, Long> {
+    // Add custom methods if needed
+}

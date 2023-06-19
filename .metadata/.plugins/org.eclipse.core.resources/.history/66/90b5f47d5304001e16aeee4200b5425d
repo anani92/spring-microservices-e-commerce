@@ -1,0 +1,11 @@
+package com.ejada.microservices.shop.proxy;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+@FeignClient(name = "wallet-service")
+public interface WalletServiceProxy {
+	@PostMapping("/v1/wallet/add")
+    void increaseShopCredits(@RequestBody Double quantity);
+}

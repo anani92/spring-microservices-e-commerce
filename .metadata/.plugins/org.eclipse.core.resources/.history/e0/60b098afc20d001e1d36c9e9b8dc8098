@@ -1,0 +1,36 @@
+package com.ejada.microservices.shop.proxy;
+
+import java.util.List;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import com.ejada.microservices.shop.model.InventoryItem;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@FeignClient(name = "inventory-service")
+public interface InventoryServiceProxy {
+
+	@GetMapping("v1/items/{itemId}/quantity/{quantity}")
+	public InventoryItem updateInventoryQuantity(@PathVariable("itemId") Long itemId, @PathVariable("quantity") int quantity);
+
+	@GetMapping("v1/items/{itemId}/supply/quantity/{quantity}")
+	public InventoryItem updateInventorySupply(@PathVariable("itemId") Long itemId, @PathVariable("quantity") int quantity);
+
+	@GetMapping("v1/items/{itemId}")
+	InventoryItem getInventoryItem(@PathVariable("itemId") long itemId);
+
+	@GetMapping("v1/items")
+	List<InventoryItem> retrieveAllItems();
+
+	@PostMapping("v1/items")
+	InventoryItem createInventoryItem(@RequestBody InventoryItem item);
+
+	@PutMapping("v1/items")
+	InventoryItem updateInventoryItem(@RequestBody InventoryItem item);
+}

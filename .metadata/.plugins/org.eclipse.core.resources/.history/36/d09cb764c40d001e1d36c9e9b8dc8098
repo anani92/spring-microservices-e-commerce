@@ -1,0 +1,71 @@
+package com.ejada.microservices.shop.proxy;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+
+import com.ejada.microservices.shop.model.InventoryItem;
+
+@Component
+public class InventoryFallbackHandler implements InventoryServiceProxy {
+
+    @Override
+    public InventoryItem updateInventoryQuantity(Long itemId, int quantity) {
+        // Return a fallback response when the updateInventoryQuantity method fails
+        InventoryItem fallbackItem = new InventoryItem();
+        fallbackItem.setId(itemId);
+        fallbackItem.setQuantity(-1);
+        fallbackItem.setItemName("Fallback Item");
+        return fallbackItem;
+    }
+
+    @Override
+    public InventoryItem updateInventorySupply(Long itemId, int quantity) {
+        InventoryItem fallbackItem = new InventoryItem();
+        fallbackItem.setId(itemId);
+        fallbackItem.setQuantity(-1);
+        fallbackItem.setItemName("Fallback Item");
+        return fallbackItem;
+    }
+
+	@Override
+	public InventoryItem getInventoryItem(long itemId) {
+        InventoryItem fallbackItem = new InventoryItem();
+        fallbackItem.setId(itemId);
+        fallbackItem.setQuantity(-1);
+        fallbackItem.setItemName("Fallback Item");
+        return fallbackItem;
+	}
+
+	@Override
+	public List<InventoryItem> retrieveAllItems() {
+		List<InventoryItem> fallbackItems = new ArrayList<>();
+        InventoryItem fallbackItem = new InventoryItem();
+        fallbackItem.setQuantity(-1);
+        fallbackItem.setItemName("Fallback Item");
+        fallbackItems.add(fallbackItem);
+        return fallbackItems;
+	}
+
+	@Override
+	public InventoryItem createInventoryItem(InventoryItem item) {
+        InventoryItem fallbackItem = new InventoryItem();
+        fallbackItem.setId(item.getId());
+        fallbackItem.setQuantity(-1);
+        fallbackItem.setItemName("Fallback Item");
+        return fallbackItem;
+	}
+
+	@Override
+	public InventoryItem updateInventoryItem(InventoryItem item) {
+        InventoryItem fallbackItem = new InventoryItem();
+        fallbackItem.setId(item.getId());
+        fallbackItem.setQuantity(-1);
+        fallbackItem.setItemName("Fallback Item");
+        return fallbackItem;
+	}
+
+}

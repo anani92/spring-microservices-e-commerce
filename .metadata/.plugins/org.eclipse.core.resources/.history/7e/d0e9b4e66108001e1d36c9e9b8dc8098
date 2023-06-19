@@ -1,0 +1,9 @@
+package com.ejada.microservices.wallet.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.ejada.microservices.wallet.model.WalletItem;
+
+public interface WalletRepository extends JpaRepository<WalletItem, Long> {
+	WalletItem findByShopId(Long shopId);
+}

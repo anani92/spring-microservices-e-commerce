@@ -1,0 +1,8 @@
+package com.ejada.microservices.shop.model;
+
+import lombok.Data;
+@Data
+public class WalletItemObj {
+    private Long shopId;
+    private Double credits;
+}

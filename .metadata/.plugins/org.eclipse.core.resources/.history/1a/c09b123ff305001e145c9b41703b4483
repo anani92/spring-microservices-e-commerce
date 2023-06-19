@@ -1,0 +1,8 @@
+CREATE TABLE ShopItem (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  shop_name VARCHAR(255),
+  total_credits DECIMAL(10, 2)
+);
+
+INSERT INTO ShopItem (shop_name, total_credits) VALUES ('Shop X', 1000.0);
+INSERT INTO ShopItem (shop_name, total_credits) VALUES ('Shop Y', 500.0);

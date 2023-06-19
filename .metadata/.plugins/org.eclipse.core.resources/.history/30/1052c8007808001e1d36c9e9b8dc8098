@@ -1,0 +1,18 @@
+package com.ejada.microservices.shop.model;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class CartItem {
+	public CartItem(Long userId, Long productId, int quantity) {
+		this.userId = userId;
+		this.productId = productId;
+		this.quantity = quantity;
+	}
+	private Long userId;
+    private Long productId;
+    private Double price;
+    private int quantity;
+}

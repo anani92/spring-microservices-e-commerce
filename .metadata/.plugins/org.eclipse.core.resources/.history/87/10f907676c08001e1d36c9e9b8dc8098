@@ -1,0 +1,32 @@
+package com.ejada.microservices.shop.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.shop.model.Cart;
+import com.ejada.microservices.shop.model.CartItem;
+import com.ejada.microservices.shop.model.InventoryItem;
+import com.ejada.microservices.shop.repository.CartRepository;
+
+@Service
+public class CartService {
+	
+	@Autowired
+	private CartRepository cartRepo;
+	
+	
+	public void addToCart(Long userId, InventoryItem item, int quantity) {
+		Cart cart = cartRepo.findByUserId(userId);		
+		CartItem cartItem = new CartItem(userId, item.getId(), quantity);
+		
+	}
+	
+	public CartItem findCartItem(CartItem item, Cart cart) {
+		for (CartItem cartItem : cart.getItems()) {
+			if (cartItem.equals(item)) {
+				return cartItem;
+			}
+		}
+		return null;
+	}
+}

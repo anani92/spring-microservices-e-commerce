@@ -1,0 +1,41 @@
+package com.ejada.microservices.wallet.service;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.wallet.exceptions.WalletNotFoundException;
+import com.ejada.microservices.wallet.model.User;
+import com.ejada.microservices.wallet.model.UserWallet;
+import com.ejada.microservices.wallet.repo.UserWalletRepository;
+
+@Service
+public class UserWalletService {
+
+	@Autowired
+	UserWalletRepository userWalletRepository;
+
+	public UserWallet createUserWallet(User user) {
+		UserWallet userWallet = new UserWallet();
+		userWallet.setCredits(0.0);
+		user.setUserWallet(userWallet);
+		return userWalletRepository.save(userWallet);
+	}
+
+	public UserWallet getUserWalletById(Long walletId) {
+		return userWalletRepository.findById(walletId)
+				.orElseThrow(() -> new WalletNotFoundException("User wallet not found"));
+	}
+
+	public UserWallet getUserWalletByUserId(Long userId) {
+		return userWalletRepository.findByUserId(userId)
+				.orElseThrow(() -> new WalletNotFoundException("User wallet not found"));
+	}
+
+	public UserWallet updateCredits(Long walletId, Double credits) {
+		UserWallet userWallet = getUserWalletById(walletId);
+		userWallet.setCredits(credits);
+		return userWalletRepository.save(userWallet);
+	}
+}

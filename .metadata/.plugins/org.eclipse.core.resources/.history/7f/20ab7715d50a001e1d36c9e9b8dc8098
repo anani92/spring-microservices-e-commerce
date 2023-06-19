@@ -1,0 +1,37 @@
+package com.ejada.microservices.wallet.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.wallet.model.Transaction;
+import com.ejada.microservices.wallet.model.User;
+import com.ejada.microservices.wallet.repo.TransactionRepository;
+
+@Service
+public class TransactionService {
+	@Autowired
+	private TransactionRepository transactionRepo;
+
+	public Transaction findTransaction(Long id) {
+		Transaction transaction = transactionRepo.findById(id).get();
+		return transaction;
+	}
+
+	public List<Transaction> findUserTransactions(User user) {
+		List<Transaction> transactions = transactionRepo.findByUser(user);
+		return transactions;
+	}
+
+	public Transaction makeTransaction(User user, Double amount, String details) {
+		Transaction newTransaction = new Transaction(amount, user, details);
+		transactionRepo.save(newTransaction);
+		return newTransaction;
+
+	}
+
+	public Transaction saveTransaction(Transaction transaction) {
+		return transactionRepo.save(transaction);
+	}
+}

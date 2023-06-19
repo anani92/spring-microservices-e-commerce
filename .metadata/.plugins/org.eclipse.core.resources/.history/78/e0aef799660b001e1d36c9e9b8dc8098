@@ -1,0 +1,17 @@
+package com.ejada.microservices.gateways;
+
+import java.net.http.HttpClient;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import io.netty.resolver.DefaultAddressResolverGroup;
+
+@SpringBootApplication
+public class ApiGetwayServiceApplication {
+	HttpClient httpClient = HttpClient.create(provider).resolver(DefaultAddressResolverGroup.INSTANCE);
+	public static void main(String[] args) {
+		SpringApplication.run(ApiGetwayServiceApplication.class, args);
+	}
+
+}

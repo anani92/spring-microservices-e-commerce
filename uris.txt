@@ -1,0 +1,41 @@
+cart:	
+  - http://localhost:8000/v1/cart
+Retrieve Cart:
+GET http://localhost:8000/v1/cart/{userId}
+Add Item to Cart:
+POST http://localhost:8000/v1/cart/add/user/{userId}
+Delete Item from Cart:
+DELETE http://localhost:8000/v1/cart/delete/{userId}/item/{itemId}
+Update Cart Item Quantity:
+PUT http://localhost:8000/v1/cart/user/{userId}/item/{itemId}/quantity/{quantity}
+Delete Cart:
+DELETE http://localhost:8000/v1/cart/{userId}
+
+
+#Swagger UI:
+http://localhost:9000/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/
+
+
+
+shop:
+
+Retrieve All Shops:
+GET http://localhost:8000/v1/shop
+Get Shop by ID:
+GET http://localhost:8000/v1/shop/{id}
+Update Shop:
+PUT http://localhost:8000/v1/shop
+Create Shop:
+POST http://localhost:8000/v1/shop
+Delete Shop:
+DELETE http://localhost:8000/v1/shop/{id}
+Get Inventory Item by ID:
+GET http://localhost:8000/v1/shop/items/{itemId}
+Update Inventory Item:
+PUT http://localhost:8000/v1/shop/items
+Create Inventory Item:
+POST http://localhost:8000/v1/shop/items
+Create Order:
+POST http://localhost:8000/v1/shop/orders/create
+Get Orders by User ID:
+GET http://localhost:8000/v1/shop/orders/{userId}

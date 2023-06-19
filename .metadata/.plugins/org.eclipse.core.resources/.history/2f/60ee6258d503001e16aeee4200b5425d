@@ -1,0 +1,11 @@
+package com.ejada.microservices.shop.proxy;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@FeignClient(name = "inventory-service")
+public interface WalletServiceProxy {
+    @PutMapping("/shop-credits/increase")
+    void increaseShopCredits(@PathVariable("quantity") int quantity);
+}

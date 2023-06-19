@@ -1,0 +1,6 @@
+spring.application.name=spring-config-server
+server.port=8888
+spring.cloud.config.server.git.uri=https://github.com/anani92/config-repo.git
+spring.cloud.config.server.git.clone-on-start=true
+
+

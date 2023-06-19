@@ -1,0 +1,15 @@
+package com.ejada.microservices.shop.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.shop.repository.CartRepository;
+
+@Service
+public class CartService {
+	
+	@Autowired
+	private CartRepository cartRepo;
+	
+	public void addToCart(Long itemId, int quantity)
+}

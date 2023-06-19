@@ -1,0 +1,80 @@
+package com.ejada.microservices.shop.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.shop.exceptions.InsufficientCreditsException;
+import com.ejada.microservices.shop.exceptions.OutOfStockException;
+import com.ejada.microservices.shop.model.Cart;
+import com.ejada.microservices.shop.model.CartItem;
+import com.ejada.microservices.shop.model.Order;
+import com.ejada.microservices.shop.model.OrderItem;
+import com.ejada.microservices.shop.model.Shop;
+import com.ejada.microservices.shop.model.WalletItem;
+import com.ejada.microservices.shop.proxy.InventoryServiceProxy;
+import com.ejada.microservices.shop.proxy.WalletServiceProxy;
+import com.ejada.microservices.shop.repository.OrderRepository;
+
+@Service
+public class OrderService {
+	@Autowired
+	private OrderRepository orderRepository;
+	@Autowired
+	private WalletServiceProxy walletServiceProxy;
+	@Autowired
+	private InventoryServiceProxy inventoryProxy;
+	@Autowired
+	private CartService cartService;
+	@Autowired
+	private ShopService shopService;
+
+	public Order createOrder(Cart cart) {
+		Long userId = cart.getUserId();
+		List<OrderItem> orderItems = new ArrayList<>();
+		for (CartItem cartItem : cart.getItems()) {
+			OrderItem orderItem = new OrderItem();
+			orderItem.setProductId(cartItem.getProductId());
+			orderItem.setQuantity(cartItem.getQuantity());
+			orderItem.setPrice(cartItem.getPrice());
+			orderItem.setShopId(cartItem.getShopId());
+			orderItems.add(orderItem);
+		}
+		Double totalCost = calculateTotalCost(orderItems);
+		boolean hasSufficientCredits = walletServiceProxy.checkSufficientCredits(userId, totalCost);
+
+		if (hasSufficientCredits) {
+			walletServiceProxy.deductFromWallet(userId, totalCost);
+			Order order = new Order(userId, orderItems, totalCost);
+			for (OrderItem item : order.getItems()) {
+				try {
+				Long shopId = item.getShopId();
+				Shop shop = shopService.getShop(shopId);
+				Double itemTotalCost = item.getQuantity() * item.getPrice();
+				inventoryProxy.updateInventoryQuantity(item.getProductId(), item.getQuantity());
+				
+				WalletItem shopWallet = walletServiceProxy.increaseShopCredits(shopId, itemTotalCost);
+				shop.setTotalCredits(shopWallet.getCredits());
+				} catch (OutOfStockException e) {
+					Integer availableQuantity = inventoryProxy.getInventoryItem(item.getId()).getQuantity();
+					throw new OutOfStockException("Inventory does not have the required quantity available units is : " + availableQuantity);
+				}
+			}
+			cart.getItems().clear();
+			cartService.save(cart);
+			return orderRepository.save(order);
+		} else {
+			throw new InsufficientCreditsException("Insufficient credits in the user's wallet.");
+		}
+	}
+
+	public List<Order> getOrdersByUserId(Long userId) {
+		return orderRepository.findByUserId(userId);
+	}
+
+	private Double calculateTotalCost(List<OrderItem> items) {
+		return items.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
+	}
+}

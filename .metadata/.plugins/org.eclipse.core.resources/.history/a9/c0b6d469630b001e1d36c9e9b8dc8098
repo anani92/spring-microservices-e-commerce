@@ -1,0 +1,19 @@
+package com.ejada.microservices.gateways;
+
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ApiGatewayConfiguration {
+
+    @Bean
+    public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
+        return builder.routes()
+                .route(r -> r.path("/inventory-service/v1/items").uri("lb://inventory-service/**"))
+                .route(r -> r.path("v1/shop").uri("lb://shop-service/**"))
+                .route(r -> r.path("v1/wallet").uri("lb://wallet-service/**"))
+                .build();
+    }
+}

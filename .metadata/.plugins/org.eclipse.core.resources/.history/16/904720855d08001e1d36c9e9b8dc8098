@@ -1,0 +1,39 @@
+package com.ejada.microservices.shop.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import com.ejada.microservices.shop.model.InventoryItem;
+import com.ejada.microservices.shop.proxy.InventoryServiceProxy;
+import com.ejada.microservices.shop.proxy.WalletServiceProxy;
+import com.ejada.microservices.shop.service.ShopService;
+
+@RestController
+@RequestMapping("/v1/cart")
+public class CartController {
+	private List<InventoryItem> cart;
+	@Autowired
+	private ShopService shopService;
+	@Autowired
+	private InventoryServiceProxy inventoryProxy;
+	@Autowired
+	private WalletServiceProxy walletProxy;
+	
+	@GetMapping("/add/{itemId}")
+	public ResponseEntity<List<InventoryItem>> addToCart(@PathVariable("itemId") Long itemId) {
+		InventoryItem item = inventoryProxy.getInventoryItem(itemId);
+		if (item == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		cart.add(item);
+		return ResponseEntity.ok(cart);
+	}
+	
+	
+
+}

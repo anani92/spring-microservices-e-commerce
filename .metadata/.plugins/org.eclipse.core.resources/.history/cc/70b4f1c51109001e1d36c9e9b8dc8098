@@ -1,0 +1,38 @@
+package com.ejada.microservices.wallet.service;
+
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.wallet.exceptions.UserAlreadyExistsException;
+import com.ejada.microservices.wallet.model.User;
+import com.ejada.microservices.wallet.repo.UserRepository;
+
+@Service
+public class UserService {
+
+	private final UserRepository userRepository;
+
+	public UserService(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
+
+	public User registerUser(User user) {
+		// Check if the user already exists
+		if (userRepository.existsByUserName(user.getUserName())) {
+			throw new UserAlreadyExistsException("Username already exists");
+		}
+
+		// Save the user
+		return userRepository.save(user);
+	}
+
+	public User loginUser(String userName, String userPassword) {
+		User user = userRepository.findByUserNameAndUserPassword(userName, userPassword);
+		return user;
+
+	}
+
+	public void save(User user) {
+		userRepository.save(user);
+
+	}
+}

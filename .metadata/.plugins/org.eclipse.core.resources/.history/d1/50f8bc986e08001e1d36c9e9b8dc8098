@@ -1,0 +1,12 @@
+package com.ejada.microservices.shop.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.ejada.microservices.shop.model.Cart;
+
+@Repository
+public interface CartRepository extends JpaRepository<Cart, Long>{
+	public Cart findByUserId(long userId);
+	public void save(Cart cart);
+}

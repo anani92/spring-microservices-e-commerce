@@ -1,0 +1,47 @@
+package com.ejada.microservices.shop.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ejada.microservices.shop.model.Cart;
+import com.ejada.microservices.shop.model.CartItem;
+import com.ejada.microservices.shop.model.InventoryItem;
+import com.ejada.microservices.shop.proxy.InventoryServiceProxy;
+import com.ejada.microservices.shop.proxy.WalletServiceProxy;
+import com.ejada.microservices.shop.service.CartService;
+
+@RestController
+@RequestMapping("v1/cart")
+public class CartController {
+	@Autowired
+	private CartService cartService;
+	@Autowired
+	private InventoryServiceProxy inventoryProxy;
+	@Autowired
+	private WalletServiceProxy walletProxy;
+	
+	@GetMapping("/add/{itemId}")
+	public ResponseEntity<Cart> addToCart(@PathVariable("itemId") Long itemId, Long userId,  int quantity) {
+		InventoryItem item = inventoryProxy.getInventoryItem(itemId);
+		if (item == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		CartItem cartItem = new CartItem(itemId, userId, quantity);
+		cartItem.setProductId(itemId);
+		cartItem.setQuantity(quantity);
+		cart.add(cartItem);
+		return ResponseEntity.ok(cart);
+	}
+	
+	public void deleteItem(Long itemId) {
+
+	}
+	
+	
+
+}

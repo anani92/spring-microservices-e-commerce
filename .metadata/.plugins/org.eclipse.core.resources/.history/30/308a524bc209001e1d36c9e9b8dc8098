@@ -1,0 +1,84 @@
+package com.ejada.microservices.shop.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.ejada.microservices.shop.model.Cart;
+import com.ejada.microservices.shop.model.CartItem;
+import com.ejada.microservices.shop.repository.CartRepository;
+
+@Service
+public class CartService {
+
+	@Autowired
+	private CartRepository cartRepo;
+	@Autowired
+	private CartItemReposiory cartItemRepo;
+
+	private Double calculateTotalCost(List<CartItem> items) {
+		return items.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
+	}
+
+	public Cart addToCart(Long userId, CartItem cartItem) {
+		Cart cart = cartRepo.findByUserId(userId);
+		
+		if (cart == null) {
+			cart = new Cart(userId);
+		}
+	    cartItem.setCart(cart);
+
+		CartItem existingItem = findCartItem(cartItem.getProductId(), cart);
+
+		if (existingItem != null) {
+			existingItem.setQuantity(existingItem.getQuantity() + cartItem.getQuantity());
+			return cart;
+		} else {
+			cartItem.setCart(cart);
+			cart.getItems().add(cartItem);
+			cart.setTotalCost(calculateTotalCost(cart.getItems()));
+			cartRepo.save(cart);
+			return cart;
+		}
+	}
+
+	public void deleteCartItem(Long cartId, Long itemId) {
+		Cart cart = cartRepo.findById(cartId).get();
+		if (cart != null) {
+			List<CartItem> cartItems = cart.getItems();
+			for (CartItem item : cartItems) {
+				if (item.getProductId() == itemId) {
+					cartItems.remove(item);
+					cart.setItems(cartItems);
+					cartRepo.save(cart);
+				}
+			}
+		}
+	}
+
+	public CartItem findCartItem(Long itemId, Cart cart) {
+		for (CartItem cartItem : cart.getItems()) {
+			if (cartItem.getProductId() == itemId) {
+				return cartItem;
+			}
+		}
+		return null;
+	}
+
+	public Cart findCartById(Long cartId) {
+		Cart cart = cartRepo.findById(cartId).get();
+
+		return cart;
+	}
+
+	public Cart save(Cart cart) {
+		return cartRepo.save(cart);
+	}
+
+	public Cart findCartByUserId(long userId) {
+		Cart cart = cartRepo.findByUserId(userId);
+		return cart;
+	}
+
+}
