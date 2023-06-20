@@ -56,5 +56,11 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(CartIsEmptyException.class)
+    protected ResponseEntity<ErrorDetails> handleCartIsEmptyException(CartIsEmptyException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(),
+                request.getDescription(false));
 
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }
 }

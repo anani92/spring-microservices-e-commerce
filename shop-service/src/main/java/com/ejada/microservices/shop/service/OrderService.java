@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ejada.microservices.shop.exceptions.CartIsEmptyException;
 import com.ejada.microservices.shop.exceptions.InsufficientCreditsException;
 import com.ejada.microservices.shop.exceptions.OutOfStockException;
 import com.ejada.microservices.shop.model.Cart;
@@ -32,47 +33,45 @@ public class OrderService {
 	private ShopService shopService;
 
 	public Order createOrder(Cart cart) {
-	    Long userId = cart.getUserId();
-	    List<OrderItem> orderItems = createOrderItems(cart.getItems());
-	    Double totalCost = calculateTotalCost(orderItems);
-	    boolean hasSufficientCredits = walletServiceProxy.checkSufficientCredits(userId, totalCost);
+		if (cart.getItems().isEmpty()) {
+			throw new CartIsEmptyException("cannot create order the cart is empty!");
 
-	    if (hasSufficientCredits) {
-	        walletServiceProxy.deductFromWallet(userId, totalCost);
-	        Order order = new Order(userId, orderItems, totalCost);
+		}
+		Long userId = cart.getUserId();
+		List<OrderItem> orderItems = createOrderItems(cart.getItems());
+		Double totalCost = calculateTotalCost(orderItems);
+		boolean hasSufficientCredits = walletServiceProxy.checkSufficientCredits(userId, totalCost);
 
-	        order.getItems().forEach(item -> {
-	            Long shopId = item.getShopId();
-	            try {
-	                Shop shop = shopService.getShop(shopId);
-	                Double itemTotalCost = item.getQuantity() * item.getPrice();
-	                inventoryProxy.updateInventoryQuantity(item.getProductId(), item.getQuantity());
-	                WalletItem shopWallet = walletServiceProxy.increaseShopCredits(shopId, itemTotalCost);
-	                shop.setTotalCredits(shopWallet.getCredits());
-	            } catch (OutOfStockException e) {
-	                Integer availableQuantity = inventoryProxy.getInventoryItem(item.getId()).getQuantity();
-	                throw new OutOfStockException("Inventory does not have the required quantity available units: " + availableQuantity);
-	            }
-	        });
+		if (hasSufficientCredits) {
+			walletServiceProxy.deductFromWallet(userId, totalCost);
+			Order order = new Order(userId, orderItems, totalCost);
 
-	        cartService.clearCart(userId);
-	        return orderRepository.save(order);
-	    } else {
-	        throw new InsufficientCreditsException("Insufficient credits in the user's wallet.");
-	    }
+			order.getItems().forEach(item -> {
+				Long shopId = item.getShopId();
+				try {
+					Shop shop = shopService.getShop(shopId);
+					Double itemTotalCost = item.getQuantity() * item.getPrice();
+					inventoryProxy.updateInventoryQuantity(item.getProductId(), item.getQuantity());
+					WalletItem shopWallet = walletServiceProxy.increaseShopCredits(shopId, itemTotalCost);
+					shop.setTotalCredits(shopWallet.getCredits());
+				} catch (OutOfStockException e) {
+					Integer availableQuantity = inventoryProxy.getInventoryItem(item.getId()).getQuantity();
+					throw new OutOfStockException(
+							"Inventory does not have the required quantity available units: " + availableQuantity);
+				}
+			});
+
+			cartService.clearCart(userId);
+			return orderRepository.save(order);
+		} else {
+			throw new InsufficientCreditsException("Insufficient credits in the user's wallet.");
+		}
 	}
 
 	private List<OrderItem> createOrderItems(List<CartItem> cartItems) {
-	    return cartItems.stream()
-	            .map(cartItem -> new OrderItem(
-	                    cartItem.getProductId(),
-	                    cartItem.getShopId(),
-	                    cartItem.getPrice(),
-	                    cartItem.getQuantity()
-	            ))
-	            .collect(Collectors.toList());
+		return cartItems.stream().map(cartItem -> new OrderItem(cartItem.getProductId(), cartItem.getShopId(),
+				cartItem.getPrice(), cartItem.getQuantity())).collect(Collectors.toList());
 	}
-	
 
 	public List<Order> getOrdersByUserId(Long userId) {
 		return orderRepository.findByUserId(userId);

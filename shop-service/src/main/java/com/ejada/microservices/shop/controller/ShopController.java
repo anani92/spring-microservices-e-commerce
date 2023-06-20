@@ -123,7 +123,7 @@ public class ShopController {
 
 	@GetMapping("/orders/create/{userId}")
 	@RateLimiter(name="orderApi")
-	@Bulkhead(name="orderApi", fallbackMethod = "walletFallbackResponse")
+	@Bulkhead(name="orderApi")
 	public ResponseEntity<Order> createOrder(@PathVariable("userId") Long userId) {
 		try {
 			Cart cart = cartService.findCartByUserId(userId);
@@ -132,7 +132,7 @@ public class ShopController {
 		} catch (InsufficientCreditsException e) {
 			throw new InsufficientCreditsException("Not enough credits to place order");
 		}
-	}
+	} 
 
 	@GetMapping("/orders/{userId}")
 	public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable("userId") Long userId) {
@@ -150,7 +150,7 @@ public class ShopController {
 	public ResponseEntity<Order> walletFallbackResponse(Exception e) {
         Order fallbackWalletItem = new Order();
         fallbackWalletItem.setUserId(Long.valueOf(-1));
-        fallbackWalletItem.setTotalCost(Double.valueOf(0));
+        fallbackWalletItem.setTotalCost(Double.valueOf(-1));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(fallbackWalletItem);
 	}
 }

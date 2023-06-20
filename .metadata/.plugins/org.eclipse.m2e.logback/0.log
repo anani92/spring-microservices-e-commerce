@@ -14057,3 +14057,79 @@ Caused by: org.codehaus.plexus.util.xml.pull.XmlPullParserException: Unrecognise
 2023-06-20 10:11:36,048 [Worker-1073: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
 2023-06-20 10:11:36,048 [Worker-1073: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
 2023-06-20 10:11:36,067 [Worker-1073: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2023-06-20 10:11:36,069 [Worker-1073: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:11:36,069 [Worker-1073: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:11:36,069 [Worker-1073: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\Lenovo\eclipse-workspace\ms-task\shop-service\src\test\resources
+2023-06-20 10:20:58,677 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:20:58,677 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:20:58,678 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
+2023-06-20 10:20:58,681 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2023-06-20 10:20:58,682 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:20:58,682 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:20:58,682 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\Lenovo\eclipse-workspace\ms-task\shop-service\src\test\resources
+2023-06-20 10:23:07,852 [Worker-1087: Building Workspace] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:23:07,852 [Worker-1087: Building Workspace] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:23:07,853 [Worker-1087: Building Workspace] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
+2023-06-20 10:23:07,856 [Worker-1087: Building Workspace] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2023-06-20 10:23:07,859 [Worker-1087: Building Workspace] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:23:07,859 [Worker-1087: Building Workspace] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:23:07,859 [Worker-1087: Building Workspace] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\Lenovo\eclipse-workspace\ms-task\shop-service\src\test\resources
+2023-06-20 10:23:49,351 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:23:49,351 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:23:49,351 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
+2023-06-20 10:23:49,354 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2023-06-20 10:23:49,356 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:23:49,356 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:23:49,356 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\Lenovo\eclipse-workspace\ms-task\shop-service\src\test\resources
+2023-06-20 10:24:27,873 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:24:27,873 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:24:27,873 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
+2023-06-20 10:24:27,875 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2023-06-20 10:24:27,876 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:24:27,876 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:24:27,876 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\Lenovo\eclipse-workspace\ms-task\shop-service\src\test\resources
+2023-06-20 10:24:28,990 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:24:28,991 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:24:28,991 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
+2023-06-20 10:24:28,993 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2023-06-20 10:24:28,995 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:24:28,995 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:24:28,995 [Worker-1087: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\Lenovo\eclipse-workspace\ms-task\shop-service\src\test\resources
+2023-06-20 10:25:53,934 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:25:53,934 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:25:53,934 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
+2023-06-20 10:25:53,939 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2023-06-20 10:25:53,940 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:25:53,940 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:25:53,940 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\Lenovo\eclipse-workspace\ms-task\shop-service\src\test\resources
+2023-06-20 10:29:38,981 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:29:38,981 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:29:38,982 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
+2023-06-20 10:29:38,986 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2023-06-20 10:29:38,989 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:29:38,989 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:29:38,989 [Worker-1085: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\Lenovo\eclipse-workspace\ms-task\shop-service\src\test\resources
+2023-06-20 10:30:08,712 [Worker-1088: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:30:08,712 [Worker-1088: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:30:08,712 [Worker-1088: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
+2023-06-20 10:30:08,715 [Worker-1088: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2023-06-20 10:30:08,716 [Worker-1088: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:30:08,716 [Worker-1088: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:30:08,716 [Worker-1088: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\Lenovo\eclipse-workspace\ms-task\shop-service\src\test\resources
+2023-06-20 10:33:02,236 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:33:02,236 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:33:02,236 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
+2023-06-20 10:33:02,240 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2023-06-20 10:33:02,242 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:33:02,242 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:33:02,242 [Worker-1086: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\Lenovo\eclipse-workspace\ms-task\shop-service\src\test\resources
+2023-06-20 10:33:06,352 [Worker-1083: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:33:06,352 [Worker-1083: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:33:06,353 [Worker-1083: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
+2023-06-20 10:33:06,357 [Worker-1083: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 0 resource
+2023-06-20 10:33:06,358 [Worker-1083: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:33:06,358 [Worker-1083: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:33:06,358 [Worker-1083: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory C:\Users\Lenovo\eclipse-workspace\ms-task\shop-service\src\test\resources
+2023-06-20 10:34:00,858 [Worker-1090: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered resources.
+2023-06-20 10:34:00,858 [Worker-1090: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Using 'UTF-8' encoding to copy filtered properties files.
+2023-06-20 10:34:00,858 [Worker-1090: Building] INFO  o.e.m.c.i.embedder.EclipseLogger - Copying 1 resource
