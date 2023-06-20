@@ -60,7 +60,6 @@ public class CartController {
 	@PutMapping("/user/{userId}/item/{itemId}/quantity/{quantity}")
 	public ResponseEntity<Cart> updateCartItemQuantity(@PathVariable("userId") Long userId, @PathVariable("quantity") Integer quantity, @PathVariable("itemId") Long itemId) {
 		Cart cart = cartService.findCartByUserId(userId);		
-		
 		CartItem cartItem = cartService.findCartItem(itemId, cart.getItems());
 		if (cartItem != null) {
 			cartService.updateCartItemQuantity(cart, itemId , quantity);

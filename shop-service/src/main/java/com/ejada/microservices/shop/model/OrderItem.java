@@ -13,15 +13,13 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "order_item")
-
 @NoArgsConstructor
 @Getter
 @Setter
-public class OrderItem  {
+public class OrderItem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
 	@Column(name = "product_id")
 	private Long productId;
 	@Column(name = "shop_id")
@@ -38,6 +36,5 @@ public class OrderItem  {
 		this.price = price;
 		this.quantity = quantity;
 	}
-	
-	
+
 }

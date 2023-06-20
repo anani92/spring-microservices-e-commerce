@@ -26,7 +26,9 @@ import com.ejada.microservices.shop.service.CartService;
 import com.ejada.microservices.shop.service.OrderService;
 import com.ejada.microservices.shop.service.ShopService;
 
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 
 @RestController
@@ -88,7 +90,7 @@ public class ShopController {
 	@GetMapping("/items/{itemId}")
     @CircuitBreaker(name = "inventory-service", fallbackMethod = "fallbackResponse")
 	public ResponseEntity<InventoryItem> getInventoryItem(@PathVariable("itemId") Long itemId) {
-		logger.error("getInventoryItem method executed");
+		logger.info("getInventoryItem method executed");
 
 		InventoryItem item = inventoryProxy.getInventoryItem(itemId);
 		if (item == null) {
@@ -98,6 +100,7 @@ public class ShopController {
 	}
 
 	@PutMapping("/items")
+    @CircuitBreaker(name = "inventory-service", fallbackMethod = "fallbackResponse")
 	public ResponseEntity<InventoryItem> updateInventoryItem(@RequestBody InventoryItem item) {
 		InventoryItem updatedItem = inventoryProxy.updateInventoryItem(item);
 		return ResponseEntity.ok(updatedItem);
@@ -110,6 +113,7 @@ public class ShopController {
 	}
 
 	@PostMapping("/items")
+    @CircuitBreaker(name = "inventory-service", fallbackMethod = "fallbackResponse")
 	public ResponseEntity<InventoryItem> createInventoryItem(@RequestBody InventoryItem item) {
 		InventoryItem newItem = inventoryProxy.createInventoryItem(item);
 		return ResponseEntity.ok(newItem);
@@ -118,6 +122,8 @@ public class ShopController {
 	// ********** Order APIS ******* //
 
 	@GetMapping("/orders/create/{userId}")
+	@RateLimiter(name="orderApi")
+	@Bulkhead(name="orderApi", fallbackMethod = "walletFallbackResponse")
 	public ResponseEntity<Order> createOrder(@PathVariable("userId") Long userId) {
 		try {
 			Cart cart = cartService.findCartByUserId(userId);
@@ -140,5 +146,11 @@ public class ShopController {
         fallbackItem.setQuantity(-1);
         fallbackItem.setItemName("Fallback Item");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(fallbackItem);
+	}
+	public ResponseEntity<Order> walletFallbackResponse(Exception e) {
+        Order fallbackWalletItem = new Order();
+        fallbackWalletItem.setUserId(Long.valueOf(-1));
+        fallbackWalletItem.setTotalCost(Double.valueOf(0));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(fallbackWalletItem);
 	}
 }

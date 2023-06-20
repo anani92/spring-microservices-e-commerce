@@ -1,0 +1,146 @@
+package com.ejada.microservices.shop.controller;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ejada.microservices.shop.exceptions.InsufficientCreditsException;
+import com.ejada.microservices.shop.model.Cart;
+import com.ejada.microservices.shop.model.InventoryItem;
+import com.ejada.microservices.shop.model.Order;
+import com.ejada.microservices.shop.model.Shop;
+import com.ejada.microservices.shop.proxy.InventoryServiceProxy;
+import com.ejada.microservices.shop.service.CartService;
+import com.ejada.microservices.shop.service.OrderService;
+import com.ejada.microservices.shop.service.ShopService;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+
+@RestController
+@RequestMapping("v1/shop")
+public class ShopController {
+	@Autowired
+	private ShopService shopService;
+	@Autowired
+	private InventoryServiceProxy inventoryProxy;
+	@Autowired
+	private OrderService orderService;
+	@Autowired
+	CartService cartService;
+
+	private Logger logger = LoggerFactory.getLogger(ShopController.class);
+
+	// ********* Shop APIS ***************//
+
+	@GetMapping
+	public List<Shop> retrieveAllShops() {
+		return shopService.findAll();
+	}
+
+	@GetMapping("/{shopId}")
+	public ResponseEntity<Shop> getShop(@PathVariable("shopId") Long shopId) {
+		Shop shop = shopService.getShop(shopId);
+		if (shop == null) {
+			return ResponseEntity.notFound().build();
+		} else {
+			return ResponseEntity.ok(shop);
+		}
+	}
+
+	@PutMapping
+	public ResponseEntity<Shop> updateShop(@RequestBody Shop shop) {
+		Shop updatedItem = shopService.save(shop);
+		return ResponseEntity.ok(updatedItem);
+	}
+
+	@PostMapping
+	public ResponseEntity<Shop> createShop(@RequestBody Shop shop) {
+		Shop createdItem = shopService.save(shop);
+		return ResponseEntity.status(HttpStatus.CREATED).body(createdItem);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteShop(@PathVariable Long id) {
+		Shop item = shopService.getShop(id);
+		if (item == null) {
+			return ResponseEntity.notFound().build();
+		} else {
+			shopService.deleteShop(id);
+			return ResponseEntity.noContent().build();
+		}
+	}
+
+	// ********* Inventory proxy APIS ********** //
+	
+	@GetMapping("/items/{itemId}")
+    @CircuitBreaker(name = "inventory-service", fallbackMethod = "fallbackResponse")
+	public ResponseEntity<InventoryItem> getInventoryItem(@PathVariable("itemId") Long itemId) {
+		logger.info("getInventoryItem method executed");
+
+		InventoryItem item = inventoryProxy.getInventoryItem(itemId);
+		if (item == null) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(item);
+	}
+
+	@PutMapping("/items")
+    @CircuitBreaker(name = "inventory-service", fallbackMethod = "fallbackResponse")
+	public ResponseEntity<InventoryItem> updateInventoryItem(@RequestBody InventoryItem item) {
+		InventoryItem updatedItem = inventoryProxy.updateInventoryItem(item);
+		return ResponseEntity.ok(updatedItem);
+	}
+	@GetMapping("/items")
+    @Retry(name = "inventory-service", fallbackMethod = "fallbackResponse")
+	public ResponseEntity<List<InventoryItem>> retrieveAllInventoryItems() {
+		List<InventoryItem> allItems = inventoryProxy.retrieveAllItems();
+		return ResponseEntity.ok(allItems);
+	}
+
+	@PostMapping("/items")
+    @CircuitBreaker(name = "inventory-service", fallbackMethod = "fallbackResponse")
+	public ResponseEntity<InventoryItem> createInventoryItem(@RequestBody InventoryItem item) {
+		InventoryItem newItem = inventoryProxy.createInventoryItem(item);
+		return ResponseEntity.ok(newItem);
+	}
+
+	// ********** Order APIS ******* //
+
+	@GetMapping("/orders/create/{userId}")
+	public ResponseEntity<Order> createOrder(@PathVariable("userId") Long userId) {
+		try {
+			Cart cart = cartService.findCartByUserId(userId);
+			Order order = orderService.createOrder(cart);
+			return ResponseEntity.ok(order);
+		} catch (InsufficientCreditsException e) {
+			throw new InsufficientCreditsException("Not enough credits to place order");
+		}
+	}
+
+	@GetMapping("/orders/{userId}")
+	public ResponseEntity<List<Order>> getOrdersByUserId(@PathVariable("userId") Long userId) {
+		List<Order> orders = orderService.getOrdersByUserId(userId);
+		return ResponseEntity.ok(orders);
+	} 
+	 
+
+	public ResponseEntity<InventoryItem> fallbackResponse(Exception e) {
+        InventoryItem fallbackItem = new InventoryItem();
+        fallbackItem.setQuantity(-1);
+        fallbackItem.setItemName("Fallback Item");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(fallbackItem);
+	}
+}

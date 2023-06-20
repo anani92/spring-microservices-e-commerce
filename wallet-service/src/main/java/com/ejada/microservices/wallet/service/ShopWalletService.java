@@ -18,7 +18,7 @@ public class ShopWalletService {
 	public ShopWallet findShopWallet(Long id) {
 		Optional<ShopWallet> item = walletReposiroty.findById(id);
 		if (item.isEmpty()) {
-			throw new NoSuchElementException();
+			throw new NoSuchElementException("Wallet not found");
 		}
 		return item.get();
 	}
